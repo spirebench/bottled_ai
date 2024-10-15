@@ -1,5 +1,6 @@
 import unittest
 
+from rs.game.event import Event
 from test_helpers.resources import load_resource_state
 
 
@@ -80,3 +81,10 @@ class GameStateConverterTest(unittest.TestCase):
         state = load_resource_state("path/path_elites.json")
         self.assertEqual(0, state.get_burning_elite_position())
 
+    def test_get_event(self):
+        state = load_resource_state("event/event_falling.json")
+        self.assertEqual(Event.FALLING, state.get_event())
+
+    def test_get_unknown_event(self):
+        state = load_resource_state("event/event_unknown.json")
+        self.assertEqual("Garble garble", state.get_event())
