@@ -49,7 +49,7 @@ class TestGridSelectHandler:
             selected_count=0
         )
         
-        action = handler.handle(state)
+        action = handler.handle(state, False)
         choose_commands = [c for c in action.commands if c.startswith("choose")]
         assert len(choose_commands) == 2
 
@@ -62,7 +62,7 @@ class TestGridSelectHandler:
             selected_count=1
         )
         
-        action = handler.handle(state)
+        action = handler.handle(state, False)
         choose_commands = [c for c in action.commands if c.startswith("choose")]
         assert len(choose_commands) == 1
 
@@ -75,7 +75,7 @@ class TestGridSelectHandler:
             selected_count=2
         )
         
-        action = handler.handle(state)
+        action = handler.handle(state, False)
         choose_commands = [c for c in action.commands if c.startswith("choose")]
         assert len(choose_commands) == 0
         assert "confirm" in action.commands
@@ -85,5 +85,5 @@ class TestGridSelectHandler:
         handler = CommonGridSelectHandler(preferences=["strike"])
         state = create_mock_state(choices=["bash", "strike"], num_cards=1)
         
-        action = handler.handle(state)
+        action = handler.handle(state, False)
         assert "confirm" in action.commands
