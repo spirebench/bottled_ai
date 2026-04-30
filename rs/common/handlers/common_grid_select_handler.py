@@ -25,7 +25,7 @@ class CommonGridSelectHandler(Handler):
         num_cards = screen_state.get("num_cards", 0)
         return num_cards > 0
 
-    def handle(self, state: GameState) -> HandlerAction:
+    def handle(self, state: GameState, slay_heart: bool) -> HandlerAction:
         choices = state.get_choice_list()
         screen_state = state.game_state().get("screen_state", {})
         
