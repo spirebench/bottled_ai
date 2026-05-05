@@ -128,7 +128,7 @@ class EventHandler(Handler):
         if event_name == "Lab":
             return "choose 0"  # Free potions
 
-        if event_name == "Match and Keep":
+        if event_name == "Match and Keep!":
             # Pick the lowest still-face-down ("card{N}") choice_list index.
             # Hardcoded "choose 0" deadlocks the second-flip state because
             # index 0 is the just-flipped card and the game ignores re-
