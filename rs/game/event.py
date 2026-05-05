@@ -24,7 +24,7 @@ class Event(Enum):
     LAB = "Lab"
     LIVING_WALL = "Living Wall"
     MASKED_BANDITS = "Masked Bandits"
-    MATCH_AND_KEEP = "Match and Keep"
+    MATCH_AND_KEEP = "Match and Keep!"
     MIND_BLOOM = "Mind Bloom"
     MYSTERIOUS_SPHERE = "Mysterious Sphere"
     NLOTH = "N'loth"
