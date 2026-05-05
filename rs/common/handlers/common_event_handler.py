@@ -1,3 +1,5 @@
+import re
+
 from presentation_config import presentation_mode, p_delay, p_delay_s, slow_events
 from rs.game.event import Event
 from rs.game.screen_type import ScreenType
@@ -6,6 +8,11 @@ from rs.machine.command import Command
 from rs.machine.handlers.handler import Handler
 from rs.machine.handlers.handler_action import HandlerAction
 from rs.machine.state import GameState
+
+# Match-and-Keep face-down choice_list entries are shaped "card{N}". Face-up
+# entries are real card names (e.g. "Strike"). Used to find the next still-
+# face-down index to flip.
+_MATCH_GAME_FACE_DOWN_RE = re.compile(r"^card\d+$")
 
 
 class CommonEventHandler(Handler):
@@ -127,7 +134,21 @@ class CommonEventHandler(Handler):
                 return "choose 0"  # Free potions
 
             case Event.MATCH_AND_KEEP:
-                return "choose 0"  # Just keep clicking
+                # Pick the lowest still-face-down ("card{N}") index. On a
+                # fresh attempt all entries are face-down → "choose 0";
+                # after the first flip, index 0 is the now-face-up card
+                # name → "choose 1". Matched pairs are removed from
+                # choice_list so subsequent attempts naturally advance.
+                # Non-matching pairs are unflipped, so we'll re-try the
+                # same two indices — the 5-attempt limit bounds the loop;
+                # accept that no card is added if the first two never
+                # match. (Returning a hardcoded "choose 0" deadlocks the
+                # second-flip state: re-clicking the just-flipped card is
+                # ignored by the game and no new state is sent.)
+                for idx, entry in enumerate(state.get_choice_list()):
+                    if _MATCH_GAME_FACE_DOWN_RE.match(entry):
+                        return f"choose {idx}"
+                return "choose 0"  # intro / non-flip phase
 
             case Event.OMINOUS_FORGE:
                 if state.get_relic_counter("Omamori") >= 1:

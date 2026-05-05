@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from presentation_config import presentation_mode, p_delay, p_delay_s, slow_events
@@ -8,6 +9,9 @@ from rs.machine.command import Command
 from rs.machine.handlers.handler import Handler
 from rs.machine.handlers.handler_action import HandlerAction
 from rs.machine.state import GameState
+
+# See common_event_handler.py for full rationale; "card{N}" = face-down.
+_MATCH_GAME_FACE_DOWN_RE = re.compile(r"^card\d+$")
 
 
 class EventHandler(Handler):
@@ -125,7 +129,14 @@ class EventHandler(Handler):
             return "choose 0"  # Free potions
 
         if event_name == "Match and Keep":
-            return "choose 0"  # Just keep clicking
+            # Pick the lowest still-face-down ("card{N}") choice_list index.
+            # Hardcoded "choose 0" deadlocks the second-flip state because
+            # index 0 is the just-flipped card and the game ignores re-
+            # clicks. See common_event_handler.py for the full rationale.
+            for idx, entry in enumerate(state.get_choice_list()):
+                if _MATCH_GAME_FACE_DOWN_RE.match(entry):
+                    return f"choose {idx}"
+            return "choose 0"  # intro / non-flip phase
 
         if event_name == "Ominous Forge":
             if state.get_relic_counter("Omamori") >= 1:
