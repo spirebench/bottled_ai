@@ -1,3 +1,5 @@
+import copy
+
 from presentation_config import presentation_mode, p_delay, slow_pathing
 from rs.game.map import Map
 from rs.game.path import PathHandlerConfig
@@ -38,8 +40,13 @@ class CommonMapHandler(Handler):
         return state.screen_type() == ScreenType.MAP.value and state.has_command(Command.CHOOSE)
 
     def handle(self, state: GameState, slay_heart: bool) -> HandlerAction:
+        # Copy rather than mutate: self.config is usually the module-level
+        # default_config, shared by every handler in the process, so setting the
+        # reward on it would carry the Heart's key-seeking into non-Heart play.
+        config = self.config
         if slay_heart:
-            self.config.elite_emerald_key_reward = 5
+            config = copy.copy(self.config)
+            config.elite_emerald_key_reward = 5
 
         # Get the math and paths set up
         n = state.game_state()["screen_state"]["current_node"]
@@ -47,7 +54,7 @@ class CommonMapHandler(Handler):
         game_map = Map(state.get_map(), current_position, state.game_state()['floor'])
 
         # Sort the paths by our priorities
-        game_map.sort_paths_by_reward_to_survivability(state, self.config)
+        game_map.sort_paths_by_reward_to_survivability(state, config)
 
         # this will actually screw us with winged boots, as there are more choices and we'd be picking from a different list...
         if presentation_mode or slow_pathing:
