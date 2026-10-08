@@ -81,6 +81,14 @@ class GameStateConverterTest(unittest.TestCase):
         state = load_resource_state("path/path_elites.json")
         self.assertEqual(0, state.get_burning_elite_position())
 
+    def test_get_burning_elite_position_from_map_node_flag(self):
+        state = load_resource_state("path/path_includes_burning_elite_node_flag.json")
+        self.assertEqual('1_5', state.get_burning_elite_position())
+
+    def test_get_burning_elite_position_from_map_node_flag_key_taken(self):
+        state = load_resource_state("path/path_includes_burning_elite_node_flag_key_taken.json")
+        self.assertEqual(0, state.get_burning_elite_position())
+
     def test_get_event(self):
         state = load_resource_state("event/event_falling.json")
         self.assertEqual(Event.FALLING, state.get_event())

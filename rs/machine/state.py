@@ -217,6 +217,15 @@ class GameState:
         if 'emerald_key_node' in self.game_state()["screen_state"]:
             be = self.game_state()["screen_state"]["emerald_key_node"]
             burning_elite_position = str(be["x"]) + "_" + str(be["y"])
+        elif not self.game_state().get("keys", {}).get("emerald"):
+            # CommunicationModPlus marks the burning elite on its map node
+            # ("has_emerald_key") rather than adding screen_state.emerald_key_node.
+            # The game never clears the node's flag once the key is taken, so the
+            # key itself is checked too.
+            for node in self.game_state().get("map") or []:
+                if node.get("has_emerald_key"):
+                    burning_elite_position = str(node["x"]) + "_" + str(node["y"])
+                    break
         return burning_elite_position
 
     def get_event(self) -> Event:
